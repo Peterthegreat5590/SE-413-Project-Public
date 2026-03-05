@@ -1,0 +1,3 @@
+[submodule "Tire_Data"]
+	path = Tire_Data
+	url = git@github.com:Peterthegreat5590/SE-413-Project-Tire-Data.git

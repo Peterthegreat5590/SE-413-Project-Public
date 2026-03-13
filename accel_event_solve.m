@@ -16,9 +16,9 @@ function time = accel_event_solve(vehicle)
         velocity = velocity + acceleration*dt;
         distance = distance + velocity*dt;
         time = time+dt;
-        if mod(time,1)<dt
-            disp([time,velocity, acceleration]);
-        end
+        % if mod(time,1)<dt
+        %     disp([time,velocity, acceleration]);
+        % end
     end
 end
 
@@ -30,7 +30,7 @@ function acceleration = acceleration_model(velocity, acceleration_old, vehicle)
         
         % Calculate total tire load from vehicle mass, downforce, and
         % weight transfer due to acceleration
-        rear_tire_load = (-lift + vehicle.Mass*9.81)*vehicle.CoGFromRT/vehicle.Wheelbase + acceleration_old*vehicle.CoGHeight/vehicle.CoGFromRT;
+        rear_tire_load = (-lift + vehicle.Mass*9.81)*(1-vehicle.CoGFromRT/vehicle.Wheelbase) + acceleration_old*vehicle.CoGHeight/vehicle.CoGFromRT;
         % Call Tire model to return maximum tire grip for acceleration
         [~, f_tire] = tire_model(rear_tire_load);
         f_torque = vehicle.Torque/vehicle.TireRadius;

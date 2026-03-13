@@ -3,21 +3,32 @@ function time = skidpad_event_solve(vehicle)
     velo_max = 5;
     df = 1;
     df_tol = 0.0001;
+
     while df>df_tol
 
         velo_max_new = lateral_velo_max(velo_max,vehicle);
 
-        [~, drag] = aero_model(velo_max_new,vehicle);
+        max_powertrain = min(vehicle.Torque*vehicle.TireRadius,1000*vehicle.Power/velo_max_new);
+        velo_max_drag = inverse_aero_drag_model(max_powertrain, vehicle);
+        
+        if velo_max_new > velo_max_drag
+            disp("Drag limit reached")
+            velo_max_new = lateral_velo_max(velo_max_drag, vehicle);
 
-        if drag > min(vehicle.Torque*vehicle.TireRadius,1000*vehicle.Power/velo_max_new)
-            break
+            max_powertrain = min(vehicle.Torque*vehicle.TireRadius,1000*vehicle.Power/velo_max_new);
+            velo_max_drag = inverse_aero_drag_model(max_powertrain, vehicle);
+            
+            if velo_max_new > velo_max_drag
+                velo_max = velo_max_drag;
+                break
+            end
         else
             df = abs(velo_max_new-velo_max);
             velo_max = velo_max_new;
         end
     end
 
-    disp(velo_max)
+    % disp(velo_max)
 
     time = (16.75*pi)/velo_max; 
 end
@@ -33,14 +44,12 @@ function velo_max = lateral_velo_max(velocity, vehicle)
     f_outer = -lift/2 + vehicle.Mass*9.81/2 + vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth/2);
     f_inner = -lift/2 + vehicle.Mass*9.81/2 - vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth/2);
     
-    fo_tire_load = f_outer*vehicle.CoGFromRT/vehicle.Wheelbase;
-    fi_tire_load = f_inner*vehicle.CoGFromRT/vehicle.Wheelbase;
+    f_tire_load = (f_inner+f_outer)*vehicle.CoGFromRT/vehicle.Wheelbase;
     ro_tire_load = f_outer*(1-vehicle.CoGFromRT/vehicle.Wheelbase);
     ri_tire_load = f_inner*(1-vehicle.CoGFromRT/vehicle.Wheelbase);
 
     % Sample tire model at calculated corner loads
-    [fo_lat, ~] = tire_model(fo_tire_load);
-    [fi_lat, ~] = tire_model(fi_tire_load);
+    [f_lat, ~] = tire_model(f_tire_load);
     [ro_lat, ro_lon] = tire_model(ro_tire_load);
     [ri_lat, ri_lon] = tire_model(ri_tire_load);
 
@@ -51,7 +60,7 @@ function velo_max = lateral_velo_max(velocity, vehicle)
 
     % Total lateral acceleration available from the maximum balanced moment
     % condition possible for the front and rear axle
-    front_moment_max = (fo_lat+fi_lat)*(vehicle.Wheelbase-vehicle.CoGFromRT);
+    front_moment_max = f_lat*(vehicle.Wheelbase-vehicle.CoGFromRT);
     rear_moment_max = (ro_lateral_max+ri_lateral_max)*vehicle.CoGFromRT;
     moment_max = min(front_moment_max,rear_moment_max);
     force_max = 2*moment_max/vehicle.Wheelbase;

@@ -32,12 +32,9 @@ vehicle.RearAeroFrontalArea = 0.4421; % Rear Frontal area in m^2, default value
 vehicle.Mass = 190.5; % Weight of
 
 
-
-
+% Example for calling solver directly without minimizer:
 % start_time = datetime;
-% score = objective_function(0.4,0.5, vehicle);
-% ineq = constraint_function(0.4,0.5, vehicle);
-% disp(ineq)
+% score = comp_solver(0.4,0.5, vehicle);
 % total_time = datetime - start_time;
 % total_time.Format = 'mm:ss.SSS';
 % disp(score)

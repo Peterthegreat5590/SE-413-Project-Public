@@ -12,7 +12,7 @@ function [time, alpha, velo_max] = skidpad_event_solve(vehicle)
         velo_max_drag = inverse_aero_drag_model(max_powertrain, vehicle);
         
         if velo_max_new > velo_max_drag
-            disp("Drag limit reached")
+            % disp("Drag limit reached")
             [velo_max_new, alpha] = lateral_velo_max(velo_max_drag, vehicle);
 
             max_powertrain = min(vehicle.Torque*vehicle.TireRadius,1000*vehicle.Power/velo_max_new);

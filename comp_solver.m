@@ -17,8 +17,8 @@ function [score, ineq] = comp_solver(front_aero_frontal_area, rear_aero_frontal_
     skidpad_time_bounded = min(t_max_skidpad,skidpad_time);
     skidpad_score = 71.5*(((t_max_skidpad/skidpad_time_bounded)^2 - 1)/((t_max_skidpad/t_min_skidpad)^2 - 1)) + 3.5;
 
-    disp([skidpad_score, accel_score])
-    disp([skidpad_time, accel_time])
+    % disp([skidpad_score, accel_score])
+    % disp([skidpad_time, accel_time])
     
     score = skidpad_score + accel_score;
 
@@ -30,7 +30,7 @@ function [score, ineq] = comp_solver(front_aero_frontal_area, rear_aero_frontal_
     alpha_f = alpha(1);
     alpha_r = alpha(2);
     k = (alpha_f-alpha_r)/ay;
-    disp(alpha)
+    % disp(alpha)
     if k<0
         vcrit = sqrt(-vehicle.Wheelbase/k);
     else

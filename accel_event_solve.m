@@ -28,9 +28,9 @@ function acceleration = acceleration_model(velocity, acceleration_old, vehicle)
         % drag for acceleration
         [lift, drag] = aero_model(velocity,vehicle);
         
-        % Calculate total tire load from vehicle mass, downforce, and
-        % weight transfer due to acceleration
-        rear_tire_load = (-lift + vehicle.Mass*9.81)*(1-vehicle.CoGFromRT/vehicle.Wheelbase) + acceleration_old*vehicle.CoGHeight/vehicle.CoGFromRT;
+        % Calculate total tire load from vehicle mass, downforce,
+        % weight transfer due to acceleration, and drag moment
+        rear_tire_load = ((vehicle.Mass*9.81)*(vehicle.Wheelbase-vehicle.CoGFromRT)-lift*(vehicle.Wheelbase-vehicle.CoPFromRT) + acceleration_old*vehicle.CoGHeight/2 + drag*vehicle.CoPHeight/2)/vehicle.Wheelbase;
         % Call Tire model to return maximum tire grip for acceleration
         [~, f_tire] = tire_model(rear_tire_load);
         f_torque = vehicle.Torque/vehicle.TireRadius;

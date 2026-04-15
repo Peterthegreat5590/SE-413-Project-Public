@@ -48,3 +48,25 @@ disp(total_time)
 
 disp(-f)
 disp(x)
+
+front = 0:0.1:1;
+rear = 0:0.1:1;
+
+[Fr, Re] = meshgrid(front, rear);
+
+Ob = zeros(size(Fr));
+for i = 1:length(rear)
+    for j = 1:length(front)
+        [score, ineq] = comp_solver(Fr(i,j),Re(i,j),vehicle);
+        Ob(i,j) = score;
+    end
+end
+
+hold on
+contourf(Fr, Re, Ob, 21)
+plot(x(1), x(2), "k.",MarkerSize=20)
+c = colorbar();
+c.Label.String = "Total Score";
+xlabel("Front Aerodynamic Frontal Area (m^2)")
+ylabel("Rear Aerodynamic Frontal Area (m^2)")
+title("Predicted Score of a FSAE car vs Aerodynamic Surface Area")

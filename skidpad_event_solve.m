@@ -44,8 +44,8 @@ function [velo_max, alpha] = lateral_velo_max(velocity, vehicle)
     
     f_tire_load = (vehicle.Mass*9.81*vehicle.CoGFromRT - lift*vehicle.CoPFromRT - drag*vehicle.CoPHeight/2)/vehicle.Wheelbase;
     r_tire_load = (vehicle.Mass*9.81*(vehicle.Wheelbase-vehicle.CoGFromRT) - lift*(vehicle.Wheelbase-vehicle.CoPFromRT) + drag*vehicle.CoPHeight/2)/vehicle.Wheelbase;
-    ro_tire_load = r_tire_load/2 + vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth/2);
-    ri_tire_load = r_tire_load/2 - vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth/2);
+    ro_tire_load = r_tire_load/2 + vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth*2);
+    ri_tire_load = r_tire_load/2 - vehicle.Mass*lateral_accel_current*vehicle.CoGHeight/(vehicle.Trackwidth*2);
 
     % Sample tire model at calculated corner loads
     [~, ro_lon] = tire_model(ro_tire_load);
@@ -82,7 +82,6 @@ function [velo_max, alpha] = lateral_velo_max(velocity, vehicle)
         rear_moment = (ro_lateral+ri_lateral)*vehicle.CoGFromRT;
         eq = front_moment-rear_moment;
     end
-    
     opts = optimoptions("fmincon","Display","none");
     alpha = fmincon(fopt,[0.15,0.15],[],[],[],[],[0,0],[pi/2,pi/2],@cons_func,opts);
 

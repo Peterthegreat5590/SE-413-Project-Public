@@ -12,7 +12,7 @@ max_front_area = 0.25*3 + 0.25*(3-0.407); % See FSAE Rules 2026 V1 T.7.7 for mor
 max_rear_area = (1.2-0.407)*(3-0.407);
 
 % Placeholder for Optimization solver
-opts = optimoptions("fmincon","FunctionTolerance",1e-4,"StepTolerance",1e-4,"OptimalityTolerance",1e-4);
+opts = optimoptions("fmincon","FunctionTolerance",1e-5,"StepTolerance",1e-5,"OptimalityTolerance",1e-5);
 [x, f, exitflag, output] = fmincon(fun,[0.5,0.5],[],[],[],[],[0,0],[max_front_area, max_rear_area],cfun,opts);
 
 

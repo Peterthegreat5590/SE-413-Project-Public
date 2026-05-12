@@ -59,9 +59,15 @@ rear = 0:0.1:1.5;
 
 Ob = zeros(size(Fr));
 
+%optimal vehicle model
+vehicleOpt = vehicle;
 AccelTime = zeros(size(Fr));
 SkidpadTime = zeros(size(Fr));
 
+%solver opt score
+[score_opt, constraint_opt] = comp_solver(front_opt, rear_opt, vehicle);
+accel_time = accel_event_solve(vehicleOpt);
+[skidpad_time, ~, ~] = skidpad_event_solve(vehicleOpt);
 
 for i = 1:length(rear)
     for j = 1:length(front)
@@ -80,14 +86,18 @@ for i = 1:length(rear)
     end
 end
 
+%score vs surface area
 hold on
 contourf(Fr, Re, Ob, 21)
-plot(x(1), x(2), "k.",MarkerSize=20)
+plot(front_opt, rear_opt, "k.",MarkerSize=20)
 c = colorbar();
 c.Label.String = "Total Score";
 xlabel("Front Aerodynamic Frontal Area (m^2)")
 ylabel("Rear Aerodynamic Frontal Area (m^2)")
 title("Predicted Score of a FSAE car vs Aerodynamic Surface Area")
+legend("Location", "best");
+grid on;
+box on;
 
 %trade off plots
 figure;
@@ -123,3 +133,44 @@ title("Skidpad Time vs. Front and Rear Aero Area");
 
 grid on;
 box on;
+
+%multistart
+num_start_points = 8;
+use_parralel = true;
+
+if isempty(gcp("nocreate"))
+    parpool;
+end
+
+start_time_ms = datetime;
+[x_ms, f_ms, exitflag_ms, output_ms, solutions_ms] = multistart_solver(vehicle, num_start_points, use_parralel);
+total_time_ms = datetime - start_time_ms;
+total_time_ms.Format = 'mm:ss.SSS';
+
+score_ms = -f_ms;
+
+%results
+fprintf("\nOPTIMIZATION SUMMARY:\n");
+fprintf("Solver exit flag: %d\n", flag);
+fprintf("Solver message: %s\n", outp.message);
+fprintf("Iterations: %d\n", outp.iterations);
+fprintf("Function evaluations: %d\n", outp.funcCount);
+fprintf("Runtime: %s\n", string(total_time));
+
+fprintf("\nOptimal Design Variables:\n");
+fprintf("Front aero frontal area = %.4f m^2\n", front_opt);
+fprintf("Rear aero frontal area  = %.4f m^2\n", rear_opt);
+fprintf("Total aero frontal area = %.4f m^2\n", front_opt + rear_opt);
+
+fprintf("\nPerformance:\n");
+fprintf("Total score = %.4f points\n", score_opt);
+fprintf("Acceleration time = %.4f s\n", accel_time);
+fprintf("Skidpad time = %.4f s\n", skidpad_time);
+
+fprintf("\nMULTISTART RESULTS: \n");
+fprintf("Runtime: %s\n", string(total_time_ms));
+fprintf("Best front aero area = %.4f m^2\n", x_ms(1));
+fprintf("Best rear aero area  = %.4f m^2\n", x_ms(2));
+fprintf("Best total score     = %.4f points\n", score_ms);
+fprintf("Exit flag            = %d\n", exitflag_ms);
+fprintf("Local solutions found = %d\n", length(solutions_ms));

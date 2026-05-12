@@ -30,7 +30,7 @@ function [time, alpha, velo_max] = skidpad_event_solve(vehicle)
 
     % disp(velo_max)
 
-    time = (16.75*pi)/velo_max; 
+    time = (18.25*pi)/velo_max; 
 end
 
 

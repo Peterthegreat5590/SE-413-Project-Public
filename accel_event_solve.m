@@ -3,6 +3,8 @@ function time = accel_event_solve(vehicle)
     velocity = 0;
     acceleration = 0;
     time = 0;
+    time_old = time;
+    distance_old = 0;
     dt = 0.0001;
     while distance<75
 
@@ -12,13 +14,20 @@ function time = accel_event_solve(vehicle)
         k3 = acceleration_model(velocity + dt/2*k2, k2, vehicle);
         k4 = acceleration_model(velocity + dt*k3, k3, vehicle);
         
-        acceleration = (k1+2*k2+2*k3+k4)/6;
-        velocity = velocity + acceleration*dt;
-        distance = distance + velocity*dt;
+        acceleration_new = (k1+2*k2+2*k3+k4)/6;
+        velocity_new = velocity + (acceleration+acceleration_new)/2*dt;
+        distance_old = distance;
+        distance = distance + (velocity+velocity_new)/2*dt;
+        acceleration = acceleration_new;
+        velocity = velocity_new;
+        time_old = time;
         time = time+dt;
         % if mod(time,1)<dt
         %     disp([time,velocity, acceleration]);
         % end
+    end
+    if distance>75
+        time = time_old + (time-time_old)*(75-distance_old)/(distance-distance_old);
     end
 end
 

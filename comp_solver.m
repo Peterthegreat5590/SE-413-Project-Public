@@ -26,7 +26,7 @@ function [score, ineq] = comp_solver(front_aero_frontal_area, rear_aero_frontal_
     % Speed)
     vcrit_min = 34.0894;
 
-    ay = velo_max^2/8.325; % v^2/r
+    ay = velo_max^2/9.125; % v^2/r
     alpha_f = alpha(1);
     alpha_r = alpha(2);
     k = (alpha_f-alpha_r)/ay;

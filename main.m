@@ -49,14 +49,16 @@ disp(total_time)
 disp(-f)
 disp(x)
 
-front = 0:0.1:1;
-rear = 0:0.1:1;
+front = 0:0.1:1.5;
+rear = 0:0.1:1.5;
 
 [Fr, Re] = meshgrid(front, rear);
 
 Ob = zeros(size(Fr));
 for i = 1:length(rear)
     for j = 1:length(front)
+        disp(i)
+        disp(j)
         [score, ineq] = comp_solver(Fr(i,j),Re(i,j),vehicle);
         Ob(i,j) = score;
     end

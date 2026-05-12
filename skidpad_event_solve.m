@@ -67,7 +67,7 @@ function [velo_max, alpha] = lateral_velo_max(velocity, vehicle)
         moment_max = min(front_moment,rear_moment);
         force_max = 2*moment_max/vehicle.Wheelbase;
         accel_max = force_max/vehicle.Mass;
-        velo = sqrt(8.325*accel_max); %v = sqrt(r*a); a = v^2/r
+        velo = sqrt(9.125*accel_max); %v = sqrt(r*a); a = v^2/r
     end
     fopt = @(x) -velo_func(x);
 

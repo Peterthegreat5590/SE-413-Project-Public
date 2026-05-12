@@ -42,6 +42,9 @@ vehicle.Mass = 190.5; % Weight of
 
 start_time = datetime;
 [x,f,flag,outp] = edo_problem_solver(vehicle);
+xopt = x;
+front_opt = xopt(1);
+rear_opt  = xopt(2);
 total_time = datetime - start_time;
 total_time.Format = 'mm:ss.SSS';
 disp(total_time)
@@ -55,12 +58,25 @@ rear = 0:0.1:1.5;
 [Fr, Re] = meshgrid(front, rear);
 
 Ob = zeros(size(Fr));
+
+AccelTime = zeros(size(Fr));
+SkidpadTime = zeros(size(Fr));
+
+
 for i = 1:length(rear)
     for j = 1:length(front)
-        disp(i)
-        disp(j)
+        %disp(i);
+        %disp(j);
         [score, ineq] = comp_solver(Fr(i,j),Re(i,j),vehicle);
         Ob(i,j) = score;
+
+        vehicle_temp = vehicle;
+        vehicle_temp.FrontAeroFrontalArea = Fr(i,j);
+        vehicle_temp.RearAeroFrontalArea = Re(i,j);
+        vehicle_temp = vehicle_model(vehicle_temp);
+
+        AccelTime(i,j) = accel_event_solve(vehicle_temp);
+        [SkidpadTime(i,j), ~, ~] = skidpad_event_solve(vehicle_temp);
     end
 end
 
@@ -72,3 +88,38 @@ c.Label.String = "Total Score";
 xlabel("Front Aerodynamic Frontal Area (m^2)")
 ylabel("Rear Aerodynamic Frontal Area (m^2)")
 title("Predicted Score of a FSAE car vs Aerodynamic Surface Area")
+
+%trade off plots
+figure;
+contourf(Fr, Re, AccelTime, 21, "LineColor", "none");
+hold on;
+
+plot(front_opt, rear_opt, "kp", "MarkerSize", 14, "MarkerFaceColor", "y");
+
+c = colorbar();
+c.Label.String = "Acceleration Time (s)";
+
+xlabel("Front Aerodynamic Frontal Area (m^2)");
+ylabel("Rear Aerodynamic Frontal Area (m^2)");
+title("Acceleration Time vs. Front and Rear Aero Area");
+
+grid on;
+box on;
+
+%Skidpad Time Surface
+
+figure;
+contourf(Fr, Re, SkidpadTime, 21, "LineColor", "none");
+hold on;
+
+plot(front_opt, rear_opt, "kp", "MarkerSize", 14, "MarkerFaceColor", "y");
+
+c = colorbar();
+c.Label.String = "Skidpad Time [s]";
+
+xlabel("Front Aerodynamic Frontal Area [m^2]");
+ylabel("Rear Aerodynamic Frontal Area [m^2]");
+title("Skidpad Time vs. Front and Rear Aero Area");
+
+grid on;
+box on;

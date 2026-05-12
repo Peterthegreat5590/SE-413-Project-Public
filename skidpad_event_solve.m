@@ -36,7 +36,7 @@ end
 
 
 function [velo_max, alpha] = lateral_velo_max(velocity, vehicle)
-    lateral_accel_current = velocity^2/8.325; % v^2/r
+    lateral_accel_current = velocity^2/9.125; % v^2/r
     % Due to a prescribed equal roll stiffness front to rear, the
     % individual loads on the wheels can be calculated simply by the moment
     % arm ratios for each tire
